@@ -113,6 +113,21 @@ def list_genres():
     return {"genres": sorted(tokens)}
 
 
+@router.get("/keywords")
+def list_keywords():
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT value AS keyword, COUNT(*) AS cnt
+           FROM movies, json_each(keywords)
+           WHERE json_valid(keywords) AND json_array_length(keywords) > 0
+           GROUP BY value
+           ORDER BY cnt DESC
+           LIMIT 20"""
+    ).fetchall()
+    conn.close()
+    return {"keywords": [row["keyword"] for row in rows]}
+
+
 @router.get("/{movie_id}")
 def get_movie(movie_id: int):
     conn = get_db()

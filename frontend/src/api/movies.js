@@ -18,6 +18,7 @@ export const fetchMovies = (params) => {
 
 export const fetchMovie = (id) => req(`${BASE}/${id}`)
 export const fetchGenres = () => req(`${BASE}/genres`)
+export const fetchKeywords = () => req(`${BASE}/keywords`)
 
 export const createMovie = (body) => req(BASE, { method: 'POST', body: JSON.stringify(body) })
 export const updateMovie = (id, body) => req(`${BASE}/${id}`, { method: 'PUT', body: JSON.stringify(body) })
