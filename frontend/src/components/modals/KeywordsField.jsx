@@ -11,9 +11,10 @@ export default function KeywordsField({ value = [], onChange }) {
     fetchKeywords().then(data => setAllKeywords(data.keywords)).catch(() => {})
   }, [])
 
-  const suggestions = input.trim()
-    ? allKeywords.filter(k => k.includes(input.trim().toLowerCase()) && !value.includes(k))
-    : []
+  const trimmed = input.trim().toLowerCase()
+  const suggestions = trimmed
+    ? allKeywords.filter(k => k.includes(trimmed) && !value.includes(k))
+    : allKeywords.filter(k => !value.includes(k)).slice(0, 10)
 
   function add(kw = input) {
     const k = kw.trim().toLowerCase()

@@ -108,6 +108,14 @@ class TestEditMovie:
 
 
 class TestKeywordSuggestions:
+    def test_suggestions_appear_on_focus_without_typing(self, page):
+        # Clicking the input with no text should show top 10 keywords immediately
+        page.click("text=+ Add Movie")
+        modal(page).locator("input[placeholder='Type keyword, press Enter']").click()
+        page.wait_for_selector("ul li")
+        count = page.locator("ul li").count()
+        assert 1 <= count <= 10
+
     def test_suggestions_appear_when_typing(self, page):
         # "sci-fi" appears in 2 seed movies (Interstellar + Matrix) so it's in top 20
         page.click("text=+ Add Movie")
