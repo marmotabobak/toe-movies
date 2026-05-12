@@ -107,6 +107,40 @@ class TestEditMovie:
         assert modal(page).locator("label:has-text('Year') + input").input_value() == "1994"
 
 
+class TestKeywordSuggestions:
+    def test_suggestions_appear_when_typing(self, page):
+        # "sci-fi" appears in 2 seed movies (Interstellar + Matrix) so it's in top 20
+        page.click("text=+ Add Movie")
+        modal(page).locator("input[placeholder='Type keyword, press Enter']").fill("sci")
+        page.wait_for_selector("ul li:has-text('sci-fi')")
+
+    def test_clicking_suggestion_adds_keyword_chip(self, page):
+        page.click("text=+ Add Movie")
+        kw_input = modal(page).locator("input[placeholder='Type keyword, press Enter']")
+        kw_input.fill("sci")
+        page.wait_for_selector("ul li:has-text('sci-fi')")
+        page.locator("ul li:has-text('sci-fi')").click()
+        assert modal(page).locator("span.rounded-full:has-text('sci-fi')").is_visible()
+        assert kw_input.input_value() == ""
+
+    def test_applied_keyword_excluded_from_suggestions(self, page):
+        page.click("text=+ Add Movie")
+        kw_input = modal(page).locator("input[placeholder='Type keyword, press Enter']")
+        kw_input.fill("sci")
+        page.wait_for_selector("ul li:has-text('sci-fi')")
+        page.locator("ul li:has-text('sci-fi')").click()
+        # After adding sci-fi, typing "sci" again should not show it
+        kw_input.fill("sci")
+        page.wait_for_timeout(300)
+        assert not page.locator("ul li:has-text('sci-fi')").is_visible()
+
+    def test_suggestions_filter_by_input(self, page):
+        page.click("text=+ Add Movie")
+        modal(page).locator("input[placeholder='Type keyword, press Enter']").fill("pri")
+        page.wait_for_selector("ul li:has-text('prison')")
+        assert not page.locator("ul li:has-text('sci-fi')").is_visible()
+
+
 class TestDeleteMovie:
     def test_delete_shows_confirm_dialog(self, page):
         page.locator("text=Delete").first.click()

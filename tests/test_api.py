@@ -107,6 +107,39 @@ class TestGenres:
 
 
 # ---------------------------------------------------------------------------
+# GET /api/movies/keywords
+# ---------------------------------------------------------------------------
+
+class TestKeywords:
+    def test_returns_keywords_list(self, client):
+        r = client.get("/api/movies/keywords")
+        assert r.status_code == 200
+        assert isinstance(r.json()["keywords"], list)
+
+    def test_includes_known_keywords(self, client):
+        kws = client.get("/api/movies/keywords").json()["keywords"]
+        assert "classic" in kws
+        assert "drama" in kws
+
+    def test_frequency_ordering(self, client):
+        # Make "popular" appear in 2 movies, "rare" in only 1
+        movies = client.get("/api/movies").json()["data"]
+        client.put(f"/api/movies/{movies[0]['id']}", json={"keywords": ["popular", "rare"]})
+        client.put(f"/api/movies/{movies[1]['id']}", json={"keywords": ["popular"]})
+        kws = client.get("/api/movies/keywords").json()["keywords"]
+        assert kws.index("popular") < kws.index("rare")
+
+    def test_max_20_results(self, client):
+        assert len(client.get("/api/movies/keywords").json()["keywords"]) <= 20
+
+    def test_empty_keywords_not_counted(self, client):
+        # 4th seed movie has keywords=[] — should not cause errors or pollute results
+        r = client.get("/api/movies/keywords")
+        assert r.status_code == 200
+        assert "" not in r.json()["keywords"]
+
+
+# ---------------------------------------------------------------------------
 # GET /api/movies/:id
 # ---------------------------------------------------------------------------
 
