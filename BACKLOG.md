@@ -1,0 +1,8 @@
+- keywords: coloured, multiselect
+- admin panel
+- distributed right
+- links to movies
+- auto-refresh from OMDB
+- movie description
+- not only tvoe
+- sort vew by categories
