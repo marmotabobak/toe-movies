@@ -94,6 +94,26 @@ class TestFilters:
         wait_for_count(page, 2)
 
 
+class TestKeywordFilterSuggestions:
+    def test_shows_top_keywords_on_focus(self, page):
+        page.locator("input[placeholder='e.g. horror']").click()
+        page.wait_for_selector("ul li")
+        count = page.locator("ul li").count()
+        assert 1 <= count <= 10
+
+    def test_selecting_suggestion_applies_filter(self, page):
+        page.locator("input[placeholder='e.g. horror']").click()
+        page.wait_for_selector("ul li:has-text('sci-fi')")
+        page.locator("ul li:has-text('sci-fi')").click()
+        wait_for_count(page, 2)  # Interstellar + Matrix
+
+    def test_typing_filters_suggestions(self, page):
+        page.locator("input[placeholder='e.g. horror']").click()
+        page.locator("input[placeholder='e.g. horror']").fill("pri")
+        page.wait_for_selector("ul li:has-text('prison')")
+        assert not page.locator("ul li:has-text('sci-fi')").is_visible()
+
+
 class TestSorting:
     def test_sort_by_imdb_desc(self, page):
         # First click on IMDB = sort asc, second = desc
